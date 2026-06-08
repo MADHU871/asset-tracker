@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "NIKHILABBA12/asset-tracker"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                url: 'https://github.com/MADHU871/asset-tracker.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME:latest .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([
+                  usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                  )
+                ]) {
+
+                sh '''
+                echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                docker push $IMAGE_NAME:latest
+                '''
+              }
+            }
+        }
+
+        stage('Deploy Azure') {
+            steps {
+                echo 'Deploying to Azure'
+            }
+        }
+    }
+}
