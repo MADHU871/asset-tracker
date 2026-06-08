@@ -1,10 +1,16 @@
 const express = require("express");
+
 const app = express();
 
-app.get("/", (req,res)=>{
- res.send("Asset Tracker Running");
+const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send(`
+    <h1>Asset Tracker Application</h1>
+    <h2>DevOps Project Running Successfully</h2>
+  `);
 });
 
-app.listen(3000, ()=>{
- console.log("Server running on 3000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
