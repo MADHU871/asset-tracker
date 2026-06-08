@@ -9,14 +9,14 @@ environment {
 
 stages {
 
-    stage('Checkout') {
+    stage('Checkout Source') {
         steps {
             git branch: 'main',
                 url: 'https://github.com/MADHU871/asset-tracker.git'
         }
     }
 
-    stage('Build Node App') {
+    stage('Install Dependencies') {
         steps {
             sh 'npm install'
         }
@@ -34,7 +34,7 @@ stages {
         }
     }
 
-    stage('Docker Login') {
+    stage('Docker Hub Login') {
         steps {
             withCredentials([
                 usernamePassword(
@@ -56,29 +56,32 @@ stages {
         }
     }
 
-    stage('Deploy Azure Web App') {
+    stage('Verify Docker Image') {
         steps {
-            withCredentials([
-                string(
-                    credentialsId: 'azure-publish-profile',
-                    variable: 'AZURE_PROFILE'
-                )
-            ]) {
-                sh '''
-                echo "Azure deployment stage configured"
-                '''
-            }
+            sh "docker images"
+        }
+    }
+
+    stage('Azure Deployment') {
+        steps {
+            echo 'Docker image pushed successfully.'
+            echo 'Azure App Service will pull the latest image automatically.'
         }
     }
 }
 
 post {
+
     success {
-        echo 'Pipeline completed successfully'
+        echo 'Pipeline completed successfully!'
     }
 
     failure {
-        echo 'Pipeline failed'
+        echo 'Pipeline failed!'
+    }
+
+    always {
+        cleanWs()
     }
 }
 ```
